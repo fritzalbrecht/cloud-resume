@@ -7,6 +7,20 @@ Globals:
   Function:
     Timeout: 3
 
+Resources:
+
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: visitors
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "ID"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "ID"
+          KeyType: "HASH"
+
   GetFunction:
     Type: AWS::Serverless::Function
     Properties:
