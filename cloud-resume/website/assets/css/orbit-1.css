@@ -88,6 +88,7 @@ p {
 }
 .sidebar-wrapper .contact-list li {
   margin-bottom: 15px;
+  white-space: nowrap;
 }
 .sidebar-wrapper .contact-list li:last-child {
   margin-bottom: 0;
@@ -128,16 +129,28 @@ p {
   font-weight: 500;
   margin-bottom: 0px;
 }
-.sidebar-wrapper .languages-container .lang-desc {
+.sidebar-wrapper .certificates-container .lang-desc {
   color: rgba(255, 255, 255, 0.6);
 }
-.sidebar-wrapper .languages-list {
+.sidebar-wrapper .certificates-list {
   margin-bottom: 0;
 }
-.sidebar-wrapper .languages-list li {
+.sidebar-wrapper .certificates-list li {
   margin-bottom: 10px;
 }
-.sidebar-wrapper .languages-list li:last-child {
+.sidebar-wrapper .certificates-list li:last-child {
+  margin-bottom: 0;
+}
+.sidebar-wrapper .counter-container .lang-desc {
+  color: rgba(255, 255, 255, 0.6);
+}
+.sidebar-wrapper .counter-list {
+  margin-bottom: 0;
+}
+.sidebar-wrapper .counter-list li {
+  margin-bottom: 10px;
+}
+.sidebar-wrapper .counter-list li:last-child {
   margin-bottom: 0;
 }
 .sidebar-wrapper .interests-list {
@@ -243,6 +256,27 @@ p {
   background-clip: padding-box;
 }
 .skillset .theme-progress-bar {
+  background: #68bacd;
+}
+
+.technologies .item {
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+.technologies .level-title {
+  font-size: 14px;
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+.technologies .level-bar {
+  height: 12px;
+  background: #f5f5f5;
+  border-radius: 2px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+.technologies .theme-progress-bar {
   background: #68bacd;
 }
 
