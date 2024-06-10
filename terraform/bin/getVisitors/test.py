@@ -2,7 +2,7 @@ import unittest
 import boto3
 import simplejson
 
-from app import lambda_handler
+from getVisitors.lambda_function import lambda_handler
 
 
 class TestAPI(unittest.TestCase):

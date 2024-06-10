@@ -3,18 +3,18 @@ import boto3
 
 dynamodb = boto3.resource('dynamodb')
 
-table = dynamodb.Table('visitors')
+table = dynamodb.Table('cloud-resume-website-visitor-count')
 
 def lambda_handler(event, context):
     response = table.get_item(Key={
-            'ID':'0'
+            'ID':'Visitors-terraform-website'
     })
-    record_count = response['Item']['visitors']
+    record_count = response['Item']['Count']
     record_count = record_count + 1
     print(record_count)
     response = table.put_item(Item={
-            'ID':'0',
-            'visitors': record_count
+            'ID':'Visitors-terraform-website',
+            'Count': record_count
     })
     
     return {
