@@ -7,7 +7,7 @@ table = dynamodb.Table('cloud-resume-website-visitor-count')
 
 def lambda_handler(event, context):
     response = table.get_item(Key={
-       'ID':'Visitors-terraform-website'
+       'ID':'Visitors-cdk-website'
     })
     
     if "Item" in response: 
