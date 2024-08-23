@@ -16,29 +16,29 @@ resource "cloudflare_record" "terraform_cname_record" {
   proxied = false
 }
 
-resource "cloudflare_record" "api_gateway_domain_cname_record" {
+resource "cloudflare_record" "cdk_cname_record" {
   zone_id = var.cloudflare_zone_id
-  name    = "${aws_api_gateway_domain_name.api_gateway_domain_name.cloudfront_domain_name}"
-  value   = "${aws_api_gateway_domain_name.api_gateway_domain_name.cloudfront_zone_id}"
+  name    = "cdk"
+  value   = "d23h5vvz5n9iln.cloudfront.net"
   type    = "CNAME"
   ttl     = 3600
   proxied = false
 }
 
-resource "cloudflare_record" "api_gateway_get_visitors_cname_record" {
+resource "cloudflare_record" "edge_lambda_cname_record" {
   zone_id = var.cloudflare_zone_id
-  name    = "get"
-  value   = "${aws_api_gateway_deployment.cloud_resume_website_visitor_count_rest_api_deployment.invoke_url}path1"
+  name    = "@"
+  value   = "d3t0rjqw9dgp0m.cloudfront.net"
   type    = "CNAME"
   ttl     = 3600
   proxied = false
 }
 
-resource "cloudflare_record" "api_gateway_post_visitors_cname_record" {
+resource "cloudflare_record" "api_gateway_terraform_dns" {
   zone_id = var.cloudflare_zone_id
-  name    = "post"
-  value   = "${aws_api_gateway_deployment.cloud_resume_website_visitor_count_rest_api_deployment.invoke_url}path2"
+  name    = "api"
+  value   = "${aws_api_gateway_domain_name.fritzalbrecht.cloudfront_domain_name}"
   type    = "CNAME"
-  ttl     = 3600
+  ttl     = 1
   proxied = false
 }

@@ -1,5 +1,5 @@
 resource "aws_kms_key" "cloud_resume_website_key" {
-  description             = "This key is used to encrypt and decrypt cloud resume website bucket objects"
+  description             = "This key is used to encrypt and decrypt cloud resume website bucket objects using terraform"
   deletion_window_in_days = 10
   enable_key_rotation     = true 
 }

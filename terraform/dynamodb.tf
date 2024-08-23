@@ -10,6 +10,18 @@ resource "aws_dynamodb_table_item" "visitor-count-terraform" {
 ITEM
 }
 
+resource "aws_dynamodb_table_item" "visitor-count-cdk" {
+  table_name = aws_dynamodb_table.cloud-resume-visitor-count-table.name
+  hash_key   = aws_dynamodb_table.cloud-resume-visitor-count-table.hash_key
+
+  item = <<ITEM
+{
+  "ID": {"S": "Visitors-cdk-website"},
+  "Count": {"N": "0"}
+}
+ITEM
+}
+
 resource "aws_dynamodb_table" "cloud-resume-visitor-count-table" {
   name           = "cloud-resume-website-visitor-count"
   read_capacity  = 1

@@ -10,7 +10,7 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "iam_role_for_cloud_resume" {
-  name               = "iam_role_for_cloud_resume"
+  name               = "cloud-resume-website-terraform-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
@@ -44,6 +44,22 @@ resource "aws_iam_policy" "kms_access_policy" {
         Action   = "kms:Decrypt"
         Effect   = "Allow",
         Resource = "${aws_kms_key.cloud_resume_website_key.arn}"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "lambda_access_policy" {
+  name        = "lambda_access_policy"
+  description = "Policy to allow APIGW to invoke lambda"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action   = "lambda:InvokeFunction"
+        Effect   = "Allow",
+        Resource = "*"
       }
     ]
   })
@@ -86,4 +102,9 @@ resource "aws_iam_role_policy_attachment" "lambda_kms_policy_attachment" {
 resource "aws_iam_role_policy_attachment" "cloudwatch_policy_attachment" {
   role   = aws_iam_role.iam_role_for_cloud_resume.name
   policy_arn = aws_iam_policy.cloudwatch_access_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_invoke_policy_attachment" {
+  role   = aws_iam_role.iam_role_for_cloud_resume.name
+  policy_arn = aws_iam_policy.lambda_access_policy.arn
 }
