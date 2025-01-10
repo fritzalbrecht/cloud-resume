@@ -6,6 +6,7 @@ on:
       - 'terraform/**'
     branches:
       - main
+    workflow_dispatch
   
   release:
     types:
