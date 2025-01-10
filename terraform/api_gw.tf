@@ -57,7 +57,7 @@ resource "aws_api_gateway_integration_response" "get_visitors_post_integration_r
   
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
   }
   
@@ -104,101 +104,7 @@ resource "aws_api_gateway_integration_response" "post_visitors_post_integration_
   
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
-  }
-  
-  response_templates = {
-    "application/json" = "{}"
-  }
-}
-
-resource "aws_api_gateway_method" "get_visitors_options" {
-  rest_api_id   = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-  resource_id   = aws_api_gateway_resource.get_visitors_resource.id
-  http_method   = "OPTIONS"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "get_visitors_options_integration" {
-  rest_api_id          = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-  resource_id          = aws_api_gateway_resource.get_visitors_resource.id
-  http_method          = aws_api_gateway_method.get_visitors_options.http_method
-  type                 = "MOCK"
-  request_templates = {
-    "application/json" = "{\"statusCode\": 200}"
-  }
-}
-
-resource "aws_api_gateway_method_response" "get_visitors_options_method_response" {
-  rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-  resource_id = aws_api_gateway_resource.get_visitors_resource.id
-  http_method = aws_api_gateway_method.get_visitors_options.http_method
-  status_code = "200"
-  
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin" = true
-    "method.response.header.Access-Control-Allow-Methods" = true
-    "method.response.header.Access-Control-Allow-Headers" = true
-  }
-}
-
-resource "aws_api_gateway_integration_response" "get_visitors_options_integration_response" {
-  rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-  resource_id = aws_api_gateway_resource.get_visitors_resource.id
-  http_method = aws_api_gateway_method.get_visitors_options.http_method
-  status_code = "200"
-  
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
-  }
-  
-  response_templates = {
-    "application/json" = "{}"
-  }
-}
-
-resource "aws_api_gateway_method" "post_visitors_options" {
-  rest_api_id   = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-  resource_id   = aws_api_gateway_resource.post_visitors_resource.id
-  http_method   = "OPTIONS"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "post_visitors_options_integration" {
-  rest_api_id          = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-  resource_id          = aws_api_gateway_resource.post_visitors_resource.id
-  http_method          = aws_api_gateway_method.post_visitors_options.http_method
-  type                 = "MOCK"
-  request_templates = {
-    "application/json" = "{\"statusCode\": 200}"
-  }
-}
-
-resource "aws_api_gateway_method_response" "post_visitors_options_method_response" {
-  rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-  resource_id = aws_api_gateway_resource.post_visitors_resource.id
-  http_method = aws_api_gateway_method.post_visitors_options.http_method
-  status_code = "200"
-  
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin" = true
-    "method.response.header.Access-Control-Allow-Methods" = true
-    "method.response.header.Access-Control-Allow-Headers" = true
-  }
-}
-
-resource "aws_api_gateway_integration_response" "post_visitors_options_integration_response" {
-  rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-  resource_id = aws_api_gateway_resource.post_visitors_resource.id
-  http_method = aws_api_gateway_method.post_visitors_options.http_method
-  status_code = "200"
-  
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
   }
   
@@ -251,22 +157,3 @@ resource "aws_api_gateway_base_path_mapping" "fritzalbrecht_base_mapping" {
   domain_name = aws_api_gateway_domain_name.fritzalbrecht.domain_name
 }
 
-resource "aws_api_gateway_api_key" "cloud_resume_website_api_key_tf" {
-  name   = "cloud-resume-website-api-key-tf"
-  enabled = true
-}
-
-resource "aws_api_gateway_usage_plan" "cloud_resume_website_api_key_usage_plan_tf" {
-  name = "cloud-resume-website-api-key-usage-plan-tf"
-  
-  api_stages {
-    api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-    stage  = aws_api_gateway_stage.cloud_resume_website_visitor_count_rest_api_stage.stage_name
-  }
-}
-
-resource "aws_api_gateway_usage_plan_key" "cloud_resume_website_api_key_usage_plan_key_tf" {
-  key_id        = aws_api_gateway_api_key.cloud_resume_website_api_key_tf.id
-  key_type      = "API_KEY"
-  usage_plan_id = aws_api_gateway_usage_plan.cloud_resume_website_api_key_usage_plan_tf.id
-}
