@@ -24,7 +24,6 @@ resource "aws_api_gateway_method" "get_visitors_post" {
   resource_id   = aws_api_gateway_resource.get_visitors_resource.id
   http_method   = "POST"
   authorization = "NONE"
-  api_key_required = true
 }
 
 resource "aws_api_gateway_integration" "get_visitors_post_integration" {
@@ -71,7 +70,6 @@ resource "aws_api_gateway_method" "post_visitors_post" {
   resource_id   = aws_api_gateway_resource.post_visitors_resource.id
   http_method   = "POST"
   authorization = "NONE"
-  api_key_required = true
 }
 
 resource "aws_api_gateway_integration" "post_visitors_post_integration" {
