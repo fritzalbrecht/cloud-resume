@@ -1,0 +1,42 @@
+name: Terraform Deploy
+
+on:
+  push:
+    paths:
+      - 'terraform/**'
+    branches:
+      - main
+  release:
+    types:
+      - created
+    tags:
+      - 'terraform-*'
+
+jobs:
+  update-website:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Sync website files to S3 (Terraform)
+        if: contains(github.event.head_commit.message, 'terraform/website/')
+        run: |
+          echo "Syncing website files..."
+          aws s3 sync terraform/website/ s3://cloud-resume-website-bucket-terraform --delete
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: terraform

@@ -8,6 +8,10 @@ resource "aws_dynamodb_table_item" "visitor-count-terraform" {
   "Count": {"N": "0"}
 }
 ITEM
+
+lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_dynamodb_table_item" "visitor-count-cdk" {
@@ -20,6 +24,10 @@ resource "aws_dynamodb_table_item" "visitor-count-cdk" {
   "Count": {"N": "0"}
 }
 ITEM
+
+lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_dynamodb_table" "cloud-resume-visitor-count-table" {
