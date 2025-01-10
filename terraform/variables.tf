@@ -24,7 +24,7 @@ variable "acm_cert_arn" {
   type        = string
 }
 
-variable "cloudflare_api_key" {
+variable "cloudflare_api_token" {
   description = "The Cloudflare API Token for authentication"
   type        = string
 }
