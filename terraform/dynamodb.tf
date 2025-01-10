@@ -10,7 +10,9 @@ resource "aws_dynamodb_table_item" "visitor-count-terraform" {
 ITEM
 
 lifecycle {
-    prevent_destroy = true
+    ignore_changes = [
+      item
+    ]
   }
 }
 
@@ -26,7 +28,9 @@ resource "aws_dynamodb_table_item" "visitor-count-cdk" {
 ITEM
 
 lifecycle {
-    prevent_destroy = true
+    ignore_changes = [
+      item
+    ]
   }
 }
 
