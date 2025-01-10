@@ -7,10 +7,9 @@ terraform {
   }
 }
 
-provider "cloudflare" 
-  email   = var.cloudflare_email
+provider "cloudflare" {
   api_token = var.cloudflare_api_token
-
+}
 
 resource "cloudflare_record" "terraform_cname_record" {
   zone_id = var.cloudflare_zone_id
