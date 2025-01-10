@@ -57,7 +57,7 @@ jobs:
         if: contains(github.event.head_commit.message, 'terraform/website/')
         run: |
           echo "Syncing website files..."
-          aws s3 sync terraform/website/ s3://cloud-resume-website-bucket-terraform --delete
+          aws s3 sync website/ s3://cloud-resume-website-bucket-terraform --delete
         working-directory: ./terraform
 
       - name: Terraform Apply
