@@ -53,6 +53,13 @@ jobs:
           TF_VAR_acm_cert_arn: ${{ secrets.ACM_CERT_ARN }}
           TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
+      - name: Sync website files to S3 (Terraform)
+        if: contains(github.event.head_commit.message, 'terraform/website/')
+        run: |
+          echo "Syncing website files..."
+          aws s3 sync terraform/website/ s3://cloud-resume-website-bucket-terraform --delete
+        working-directory: ./terraform
+
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: ./terraform
