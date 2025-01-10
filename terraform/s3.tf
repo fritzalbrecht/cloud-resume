@@ -1,3 +1,10 @@
+terraform {
+  backend "s3" {
+    bucket = "cloud-resume-website-terraform-state"
+    region = "us-east-1"
+  }
+}
+
 resource "aws_s3_bucket" "cloud_resume_website_bucket" {
   bucket = "cloud-resume-website-bucket-terraform"
 }
