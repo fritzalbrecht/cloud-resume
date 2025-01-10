@@ -6,6 +6,7 @@ on:
       - 'terraform/**'
     branches:
       - main
+  
   release:
     types:
       - created
@@ -13,7 +14,7 @@ on:
       - 'terraform-*'
 
 jobs:
-  update-website:
+  terraform-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,16 +28,32 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Sync website files to S3 (Terraform)
-        if: contains(github.event.head_commit.message, 'terraform/website/')
-        run: |
-          echo "Syncing website files..."
-          aws s3 sync terraform/website/ s3://cloud-resume-website-bucket-terraform --delete
+      - name: Configure Cloudflare credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: echo "Cloudflare API Token configured."
 
       - name: Terraform Init
         run: terraform init
         working-directory: terraform
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
         working-directory: terraform
+        env:
+          TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+          TF_VAR_cloudflare_zone_id: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          TF_VAR_account_id: ${{ secrets.ACCOUNT_ID }}
+          TF_VAR_acm_cert_arn: ${{ secrets.ACM_CERT_ARN }}
+          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+        working-directory: terraform
+        env:
+          TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+          TF_VAR_cloudflare_zone_id: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          TF_VAR_account_id: ${{ secrets.ACCOUNT_ID }}
+          TF_VAR_acm_cert_arn: ${{ secrets.ACM_CERT_ARN }}
+          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        if: github.event_name == 'release'
