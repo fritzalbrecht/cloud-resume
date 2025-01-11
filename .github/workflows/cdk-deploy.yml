@@ -31,7 +31,7 @@ jobs:
         if: contains(github.event.head_commit.message, './cdk/site-contents/')
         run: |
           echo "Syncing website files..."
-          aws s3 sync cdk/site-contents/ s3://cloud-resume-website-bucket-cdk --delete
+          aws s3 sync site-contents/ s3://cloud-resume-website-bucket-cdk --delete
         working-directory: ./cdk
 
       - name: Install dependencies
