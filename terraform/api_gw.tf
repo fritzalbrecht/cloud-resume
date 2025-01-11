@@ -24,6 +24,7 @@ resource "aws_api_gateway_method" "get_visitors_post" {
   resource_id   = aws_api_gateway_resource.get_visitors_resource.id
   http_method   = "POST"
   authorization = "NONE"
+  api_key_required = false
 }
 
 resource "aws_api_gateway_integration" "get_visitors_post_integration" {
@@ -70,6 +71,7 @@ resource "aws_api_gateway_method" "post_visitors_post" {
   resource_id   = aws_api_gateway_resource.post_visitors_resource.id
   http_method   = "POST"
   authorization = "NONE"
+  api_key_required = false
 }
 
 resource "aws_api_gateway_integration" "post_visitors_post_integration" {
@@ -225,8 +227,6 @@ resource "aws_api_gateway_method_settings" "all" {
   rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
   stage_name  = aws_api_gateway_stage.cloud_resume_website_visitor_count_rest_api_stage.stage_name
   method_path = "*/*"
-  api_key_required = false
-  authorization = "NONE"
   settings {
     metrics_enabled = true
     logging_level   = "ERROR"
