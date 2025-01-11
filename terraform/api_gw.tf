@@ -128,3 +128,47 @@ module "postcors" {
   api_id          = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
   api_resource_id = aws_api_gateway_resource.post_visitors_resource.id
 }
+
+resource "aws_api_gateway_deployment" "cloud_resume_website_visitor_count_rest_api_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
+
+  triggers = {
+    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.body))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "cloud_resume_website_visitor_count_rest_api_stage" {
+  deployment_id = aws_api_gateway_deployment.cloud_resume_website_visitor_count_rest_api_deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
+  stage_name    = "prod"
+}
+
+resource "aws_api_gateway_method_settings" "all" {
+  rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
+  stage_name  = aws_api_gateway_stage.cloud_resume_website_visitor_count_rest_api_stage.stage_name
+  method_path = "*/*"
+  settings {
+    metrics_enabled = true
+    logging_level   = "ERROR"
+  }
+}
+
+resource "aws_api_gateway_domain_name" "fritzalbrecht" {
+  domain_name              = "api-tf.fritzalbrecht.com"
+  regional_certificate_arn = var.acm_cert_arn
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+}
+
+resource "aws_api_gateway_base_path_mapping" "fritzalbrecht_base_mapping" {
+  api_id      = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
+  stage_name  = aws_api_gateway_stage.cloud_resume_website_visitor_count_rest_api_stage.stage_name
+  domain_name = aws_api_gateway_domain_name.fritzalbrecht.domain_name
+}
+
