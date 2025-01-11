@@ -3,7 +3,7 @@ name: CDK Deploy
 on:
   push:
     paths:
-      - 'cdk/**'
+      - './cdk/**'
     branches:
       - main
   release:
