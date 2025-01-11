@@ -40,8 +40,8 @@ resource "cloudflare_record" "edge_lambda_cname_record" {
 
 resource "cloudflare_record" "api_gateway_invoke_url_record" {
   zone_id = var.cloudflare_zone_id
-  name    = "visitor-tf.api"
-  value   = aws_api_gateway_domain_name.fritzalbrecht.domain_name
+  name    = "api.tf"
+  value   = "aws_api_gateway_domain_name.fritzalbrecht.domain_name
   type    = "CNAME"
   ttl     = 1
   proxied = false
