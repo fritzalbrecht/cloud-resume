@@ -46,3 +46,12 @@ resource "cloudflare_record" "api_gateway_terraform_dns" {
   ttl     = 1
   proxied = false
 }
+
+resource "cloudflare_record" "api_gateway_terraform_dns" {
+  zone_id = var.cloudflare_zone_id
+  name    = "api"
+  value   = "${aws_api_gateway_deployment.cloud_resume_website_visitor_count_rest_api_deployment.invoke_url}"
+  type    = "CNAME"
+  ttl     = 1
+  proxied = false
+}
