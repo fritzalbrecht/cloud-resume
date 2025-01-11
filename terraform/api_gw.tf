@@ -142,10 +142,10 @@ resource "aws_api_gateway_method_settings" "all" {
 
 resource "aws_api_gateway_domain_name" "fritzalbrecht" {
   domain_name              = "api.fritzalbrecht.com"
-  certificate_arn = "arn:aws:acm:us-east-1:144131464452:certificate/3ab5a465-0533-4fdf-bfc6-57c4f5259e3b"
+  certificate_arn          = var.acm_cert_arn
 
   endpoint_configuration {
-    types = ["EDGE"]
+    types = ["REGIONAL"]
   }
 }
 
