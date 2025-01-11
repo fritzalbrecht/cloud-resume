@@ -28,15 +28,16 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Sync website files to S3 (CDK)
-        if: contains(github.event.head_commit.message, 'cdk/website/')
+        if: contains(github.event.head_commit.message, 'cdk/site-contents/')
         run: |
           echo "Syncing website files..."
-          aws s3 sync cdk/website/ s3://your-cdk-bucket-name --delete
+          aws s3 sync cdk/site-contents/ s3://cloud-resume-website-bucket-cdk --delete
+        working-directory: ./cdk
 
       - name: Install dependencies
         run: npm install
-        working-directory: cdk
+        working-directory: ./cdk
 
       - name: CDK Deploy
         run: npx cdk deploy --require-approval never
-        working-directory: cdk
+        working-directory: ./cdk
