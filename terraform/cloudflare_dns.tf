@@ -14,7 +14,7 @@ provider "cloudflare" {
 resource "cloudflare_record" "terraform_cname_record" {
   zone_id = var.cloudflare_zone_id
   name    = "tf"
-  value   = "${aws_cloudfront_distribution.cloud_resume_website_distribution_terraform.domain_name}"
+  value   = aws_cloudfront_distribution.cloud_resume_website_distribution_terraform.domain_name
   type    = "CNAME"
   ttl     = 3600
   proxied = false
@@ -41,7 +41,7 @@ resource "cloudflare_record" "edge_lambda_cname_record" {
 resource "cloudflare_record" "api_gateway_invoke_url_record" {
   zone_id = var.cloudflare_zone_id
   name    = "api.tf"
-  value   = "aws_api_gateway_domain_name.fritzalbrecht.domain_name
+  value   = aws_api_gateway_domain_name.fritzalbrecht.domain_name
   type    = "CNAME"
   ttl     = 1
   proxied = false
