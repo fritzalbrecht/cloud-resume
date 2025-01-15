@@ -4,6 +4,7 @@ This repository contains the infrastructure as code (IaC) and resources for host
 ## Features
 ### Hosted Resume
 Terraform Version: Hosted at tf.fritzalbrecht.com
+
 CDK Version: Hosted at cdk.fritzalbrecht.com
 Both versions leverage AWS S3 for static website hosting with version-specific infrastructure managed by their respective IaC tools.
 
