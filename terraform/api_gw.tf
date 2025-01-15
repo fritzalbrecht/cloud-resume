@@ -7,12 +7,6 @@ resource "aws_api_gateway_rest_api" "cloud_resume_website_visitor_count_rest_api
   description = "API for cloud resume website visitor count created with terraform"
 }
 
-resource "aws_api_gateway_stage" "cloud_resume_website_visitor_count_rest_api_stage" {
-  deployment_id = aws_api_gateway_deployment.cloud_resume_website_visitor_count_rest_api_deployment.id
-  rest_api_id   = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-  stage_name    = "prod"
-}
-
 resource "aws_api_gateway_method_settings" "all" {
   rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
   stage_name  = aws_api_gateway_stage.cloud_resume_website_visitor_count_rest_api_stage.stage_name
@@ -139,7 +133,7 @@ resource "aws_api_gateway_resource" "post_visitors" {
 resource "aws_api_gateway_method" "post_visitors" {
   rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
   resource_id   = aws_api_gateway_resource.post_visitors.id
-  http_method   = "post"
+  http_method   = "POST"
   authorization = "NONE"
 }
 
