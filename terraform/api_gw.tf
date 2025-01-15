@@ -233,7 +233,7 @@ resource "aws_api_gateway_deployment" "cloud_resume_website_visitor_count_rest_a
   depends_on = [
     aws_api_gateway_integration.post_visitors_options_integration,
     aws_api_gateway_integration_response.post_visitors_options_integration_response,
-    aws_api_gateway_integration_response.post_visitors_integration_response,
+    aws_api_gateway_integration_response.post_visitors_post_integration_response,
     aws_api_gateway_integration.get_visitors_options_integration,
     aws_api_gateway_integration_response.get_visitors_options_integration_response,
     aws_api_gateway_integration_response.get_visitors_integration_response
