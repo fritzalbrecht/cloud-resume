@@ -41,6 +41,7 @@ resource "aws_api_gateway_base_path_mapping" "fritzalbrecht_base_mapping" {
 #-----------------------------------------------------------------------------------
 # get_visitors function
 #-----------------------------------------------------------------------------------
+
 resource "aws_api_gateway_resource" "get_visitors" {
   rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
   parent_id   = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.root_resource_id
@@ -128,6 +129,7 @@ resource "aws_api_gateway_method_response" "get_visitors_method_response" {
 # post_visitors function
 #-----------------------------------------------------------------------------------
 
+
 resource "aws_api_gateway_resource" "post_visitors" {
   rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
   parent_id   = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.root_resource_id
@@ -209,4 +211,13 @@ resource "aws_api_gateway_method_response" "post_visitors_method_response" {
     "method.response.header.Access-Control-Allow-Methods" = true
     "method.response.header.Access-Control-Allow-Origin"  = true
   }
+}
+
+#-----------------------------------------------------------------------------------
+# deployment
+#-----------------------------------------------------------------------------------
+
+resource "aws_api_gateway_deployment" "prod_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
+  stage_name = "prod"
 }

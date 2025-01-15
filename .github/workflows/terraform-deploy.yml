@@ -2,8 +2,6 @@ name: Terraform Deploy
 
 on:
   push:
-    paths:
-      - './terraform'
     branches:
       - main
   workflow_dispatch:
