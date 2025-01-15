@@ -7,31 +7,6 @@ resource "aws_api_gateway_rest_api" "cloud_resume_website_visitor_count_rest_api
   description = "API for cloud resume website visitor count created with terraform"
 }
 
-resource "aws_api_gateway_method_settings" "all" {
-  rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-  stage_name  = aws_api_gateway_stage.cloud_resume_website_visitor_count_rest_api_stage.stage_name
-  method_path = "*/*"
-  settings {
-    metrics_enabled = true
-    logging_level   = "ERROR"
-  }
-}
-
-resource "aws_api_gateway_domain_name" "fritzalbrecht" {
-  domain_name              = "api-tf.fritzalbrecht.com"
-  regional_certificate_arn = var.acm_cert_arn
-
-  endpoint_configuration {
-    types = ["REGIONAL"]
-  }
-}
-
-resource "aws_api_gateway_base_path_mapping" "fritzalbrecht_base_mapping" {
-  api_id      = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-  stage_name  = aws_api_gateway_deployment.prod_deployment.stage_name
-  domain_name = aws_api_gateway_domain_name.fritzalbrecht.domain_name
-}
-
 #-----------------------------------------------------------------------------------
 # get_visitors function
 #-----------------------------------------------------------------------------------
@@ -208,10 +183,35 @@ resource "aws_api_gateway_method_response" "post_visitors_method_response" {
 }
 
 #-----------------------------------------------------------------------------------
-# deployment
+# deployment settings
 #-----------------------------------------------------------------------------------
 
 resource "aws_api_gateway_deployment" "prod_deployment" {
   rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
   stage_name = "prod"
+}
+
+resource "aws_api_gateway_method_settings" "all" {
+  rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
+  stage_name  = aws_api_gateway_deployment.prod_deployment.stage_name
+  method_path = "*/*"
+  settings {
+    metrics_enabled = true
+    logging_level   = "ERROR"
+  }
+}
+
+resource "aws_api_gateway_domain_name" "fritzalbrecht" {
+  domain_name              = "api-tf.fritzalbrecht.com"
+  regional_certificate_arn = var.acm_cert_arn
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+}
+
+resource "aws_api_gateway_base_path_mapping" "fritzalbrecht_base_mapping" {
+  api_id      = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
+  stage_name  = aws_api_gateway_deployment.prod_deployment.stage_name
+  domain_name = aws_api_gateway_domain_name.fritzalbrecht.domain_name
 }
