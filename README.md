@@ -6,12 +6,15 @@ This repository contains the infrastructure as code (IaC) and resources for host
 Terraform Version: Hosted at tf.fritzalbrecht.com
 
 CDK Version: Hosted at cdk.fritzalbrecht.com
+
 Both versions leverage AWS S3 for static website hosting with version-specific infrastructure managed by their respective IaC tools.
 
 ### Automated Deployment Workflows
 Terraform: Automatically deploys updates or performs a full deployment upon tagged releases matching the pattern terraform-*. Website files are synced to the S3 bucket and infrastructure changes are applied via Terraform.
+
 CDK: Automatically deploys updates or performs a full deployment upon tagged releases matching the pattern cdk-*. Website files are synced to the S3 bucket, and changes are deployed using CDK.
-Cloudflare DNS
+
+### Cloudflare DNS
 Domain name management is automated with Cloudflare via Terraform configurations, ensuring seamless integration and management.
 
 ### End-to-End Encryption
