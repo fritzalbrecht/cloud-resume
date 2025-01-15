@@ -28,7 +28,7 @@ resource "aws_api_gateway_domain_name" "fritzalbrecht" {
 
 resource "aws_api_gateway_base_path_mapping" "fritzalbrecht_base_mapping" {
   api_id      = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
-  stage_name  = aws_api_gateway_stage.cloud_resume_website_visitor_count_rest_api_stage.stage_name
+  stage_name  = aws_api_gateway_deployment.prod_deployment.stage_name
   domain_name = aws_api_gateway_domain_name.fritzalbrecht.domain_name
 }
 
