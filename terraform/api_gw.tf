@@ -156,7 +156,7 @@ resource "aws_api_gateway_integration_response" "get_visitors_post_integration_r
 resource "aws_api_gateway_integration_response" "get_visitors_integration_response" {
   rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
   resource_id = aws_api_gateway_resource.get_visitors_resource.id
-  http_method = aws_api_gateway_method.get_visitors.http_method
+  http_method = aws_api_gateway_method.get_visitors_options.http_method
   status_code = "200"
 
   response_parameters = {
@@ -169,7 +169,7 @@ resource "aws_api_gateway_integration_response" "get_visitors_integration_respon
 resource "aws_api_gateway_method_response" "get_visitors_response" {
   rest_api_id = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
   resource_id = aws_api_gateway_resource.get_visitors_resource.id
-  http_method = aws_api_gateway_method.get_visitors.http_method
+  http_method = aws_api_gateway_method.get_visitors_options.http_method
   status_code = "200"
 
   response_parameters = {
