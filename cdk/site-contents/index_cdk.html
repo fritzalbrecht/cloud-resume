@@ -231,8 +231,8 @@
         <script>
             visitorCount = document.getElementById('visitors');
 
-            fetch('https://5lojgsv5w4.execute-api.us-east-1.amazonaws.com/prod/post-visitors-tf')
-                .then(() => fetch('https://5lojgsv5w4.execute-api.us-east-1.amazonaws.com/prod/get-visitors-tf'))
+            fetch('https://ryse15m27c.execute-api.us-east-1.amazonaws.com/prod/post-visitors')
+                .then(() => fetch('https://ryse15m27c.execute-api.us-east-1.amazonaws.com/prod/get-visitors'))
                 .then(response => response.json())
                 .then(data => (visitorCount.innerHTML = (data)));
 
