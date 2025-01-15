@@ -37,3 +37,12 @@ resource "cloudflare_record" "edge_lambda_cname_record" {
   ttl     = 3600
   proxied = false
 }
+
+resource "cloudflare_record" "api_gateway_invoke_url_record" {
+  zone_id = var.cloudflare_zone_id
+  name    = "api-tf"
+  value   = aws_api_gateway_domain_name.fritzalbrecht.regional_domain_name
+  type    = "CNAME"
+  ttl     = 1
+  proxied = false
+}
