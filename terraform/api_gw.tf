@@ -179,7 +179,6 @@ resource "aws_api_gateway_method_response" "get_visitors_response" {
   }
 }
 
-
 resource "aws_api_gateway_method" "post_visitors_post" {
   rest_api_id   = aws_api_gateway_rest_api.cloud_resume_website_visitor_count_rest_api.id
   resource_id   = aws_api_gateway_resource.post_visitors_resource.id
