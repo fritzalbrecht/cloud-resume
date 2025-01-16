@@ -3,7 +3,7 @@ This repository contains the infrastructure as code (IaC) and resources for host
 
 ## Features
 ### Hosted Resume
-Website: fritzalbrecht.com
+Website: <fritzalbrecht.com>
 
 Terraform Version: Hosted at tf.fritzalbrecht.com
 
