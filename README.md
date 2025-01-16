@@ -3,6 +3,8 @@ This repository contains the infrastructure as code (IaC) and resources for host
 
 ## Features
 ### Hosted Resume
+Website: fritzalbrecht.com
+
 Terraform Version: Hosted at tf.fritzalbrecht.com
 
 CDK Version: Hosted at cdk.fritzalbrecht.com
