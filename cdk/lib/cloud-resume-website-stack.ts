@@ -246,7 +246,6 @@ export class cloudResumeWebsiteCDKStack extends Construct {
 
     const domainName = new apigateway.DomainName(this, 'ApiDomainName', {
       domainName: 'api-cdk.fritzalbrecht.com',
-      certificate: certificateArn,
       endpointType: apigateway.EndpointType.REGIONAL,
     });
 
