@@ -12,6 +12,7 @@ import { CfnOutput, Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import path = require('path');
+import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 
 export interface StaticSiteProps {
   domainName: string;
@@ -193,6 +194,77 @@ export class cloudResumeWebsiteCDKStack extends Construct {
       resources: [cloudResumeKMSKey.keyArn, 'arn:aws:kms:us-east-1:144131464452:key/aea10066-24a4-4af3-8f8a-a020a964817a'],
       sid: 'AllowKMSDecryption',
     }));
+
+    const cloudResumeWebsiteVisitorCountApiCDK = new apigateway.RestApi(this, 'CloudResumeApi', {
+      restApiName: 'cloud-resume-website-visitor-count-api',
+      description: 'API for cloud resume website visitor count defined in CDK',
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+      },
+      deployOptions: {
+        stageName: 'prod',
+        metricsEnabled: true,
+        loggingLevel: apigateway.MethodLoggingLevel.ERROR,
+      },
+    });
+
+    const getVisitorsResource = cloudResumeWebsiteVisitorCountApiCDK.root.addResource('get-visitors');
+    getVisitorsResource.addMethod(
+      'GET',
+      new apigateway.LambdaIntegration(getVisitorsCDK),
+      {
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Origin': true,
+              'method.response.header.Access-Control-Allow-Headers': true,
+              'method.response.header.Access-Control-Allow-Methods': true,
+            },
+          },
+        ],
+      }
+    );
+
+    const postVisitorsResource = cloudResumeWebsiteVisitorCountApiCDK.root.addResource('post-visitors');
+    postVisitorsResource.addMethod(
+      'POST',
+      new apigateway.LambdaIntegration(postVisitorsCDK),
+      {
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Origin': true,
+              'method.response.header.Access-Control-Allow-Headers': true,
+              'method.response.header.Access-Control-Allow-Methods': true,
+            },
+          },
+        ],
+      }
+    );
+
+    const domainName = new apigateway.DomainName(this, 'ApiDomainName', {
+      domainName: 'api-cdk.fritzalbrecht.com',
+      certificate: certificateArn,
+      endpointType: apigateway.EndpointType.REGIONAL,
+    });
+
+    new apigateway.BasePathMapping(this, 'BasePathMapping', {
+      domainName: domainName,
+      restApi: cloudResumeWebsiteVisitorCountApiCDK,
+      stage: cloudResumeWebsiteVisitorCountApiCDK.deploymentStage,
+    });
+
+    cloudResumeWebsiteVisitorCountApiCDK.addGatewayResponse('CORS4XX', {
+      type: apigateway.ResponseType.DEFAULT_4XX,
+      responseHeaders: {
+        'Access-Control-Allow-Origin': "'*'",
+      },
+      templates: {
+        'application/json': '{"message":$context.error.messageString}',
+      },
+    });
 
   }
 }
