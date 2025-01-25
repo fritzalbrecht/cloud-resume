@@ -231,10 +231,10 @@
         <script>
                 visitorCount = document.getElementById('visitorCount');
 
-                fetch('https://r72vdsdhg4.execute-api.us-east-1.amazonaws.com/prod/post-visitors', {
+                fetch('https://api-cdk.fritzalbrecht.com/post-visitors', {
                     method: 'POST',
                 })
-                    .then(() => fetch('https://r72vdsdhg4.execute-api.us-east-1.amazonaws.com/prod/get-visitors'))
+                    .then(() => fetch('https://api-cdk.fritzalbrecht.com/get-visitors'))
                     .then(response => response.json())
                     .then(data => {
                         visitorCount.innerHTML = JSON.stringify(data);

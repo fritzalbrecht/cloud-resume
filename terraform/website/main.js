@@ -1,9 +1,9 @@
 visitorCount = document.getElementById('visitorCount');
 
-fetch('https://ryse15m27c.execute-api.us-east-1.amazonaws.com/prod/post-visitors', {
+fetch('https://api-tf.fritzalbrecht.com/post-visitors', {
     method: 'POST',
 })
-    .then(() => fetch('https://ryse15m27c.execute-api.us-east-1.amazonaws.com/prod/get-visitors'))
+    .then(() => fetch('https://api-tf.fritzalbrecht.com/get-visitors'))
     .then(response => response.json())
     .then(data => {
         visitorCount.innerHTML = JSON.stringify(data);
