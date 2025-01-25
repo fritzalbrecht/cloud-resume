@@ -196,7 +196,7 @@ export class cloudResumeWebsiteCDKStack extends Construct {
     }));
 
     const cloudResumeWebsiteVisitorCountApiCDK = new apigateway.RestApi(this, 'CloudResumeApi', {
-      restApiName: 'cloud-resume-website-visitor-count-api',
+      restApiName: 'cloud-resume-website-visitor-count-api-cdk',
       description: 'API for cloud resume website visitor count defined in CDK',
       defaultCorsPreflightOptions: {
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
