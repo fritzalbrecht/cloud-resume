@@ -252,7 +252,6 @@ export class cloudResumeWebsiteCDKStack extends Construct {
 
     new apigateway.BasePathMapping(this, 'BasePathMapping', {
       domainName: domainName,
-      certificate: certificate, 
       restApi: cloudResumeWebsiteVisitorCountApiCDK,
       stage: cloudResumeWebsiteVisitorCountApiCDK.deploymentStage,
     });
