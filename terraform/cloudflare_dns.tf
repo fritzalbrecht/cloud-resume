@@ -11,6 +11,10 @@ provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
+data "aws_api_gateway_domain_name" "cdk_domain_name" {
+  domain_name = "api-cdk.fritzalbrecht.com"
+}
+
 resource "cloudflare_record" "terraform_cname_record" {
   zone_id = var.cloudflare_zone_id
   name    = "tf"
@@ -42,6 +46,15 @@ resource "cloudflare_record" "api_gateway_invoke_url_record" {
   zone_id = var.cloudflare_zone_id
   name    = "api-tf"
   value   = aws_api_gateway_domain_name.fritzalbrecht.regional_domain_name
+  type    = "CNAME"
+  ttl     = 1
+  proxied = false
+}
+
+resource "cloudflare_record" "api_gateway_invoke_url_record" {
+  zone_id = var.cloudflare_zone_id
+  name    = "api-cdk"
+  value   = aws_api_gateway_domain_name.cdk_domain_name.regional_domain_name
   type    = "CNAME"
   ttl     = 1
   proxied = false
