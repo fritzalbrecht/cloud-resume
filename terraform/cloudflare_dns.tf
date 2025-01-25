@@ -54,7 +54,7 @@ resource "cloudflare_record" "api_gateway_invoke_url_record_tf" {
 resource "cloudflare_record" "api_gateway_invoke_url_record_cdk" {
   zone_id = var.cloudflare_zone_id
   name    = "api-cdk"
-  value   = aws_api_gateway_domain_name.cdk_domain_name.regional_domain_name
+  value   = aws_api_gateway_domain_name.cdk_domain_name.domain_name
   type    = "CNAME"
   ttl     = 1
   proxied = false
