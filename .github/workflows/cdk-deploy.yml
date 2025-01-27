@@ -26,6 +26,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./cdk
+      
       - name: CDK Synthesize
         run: npx cdk synth
         working-directory: ./cdk    
@@ -34,10 +38,6 @@ jobs:
         run: |
           echo "Syncing website files..."
           aws s3 sync site-contents/ s3://cloud-resume-website-bucket-cdk --delete
-        working-directory: ./cdk
-
-      - name: Install dependencies
-        run: npm install
         working-directory: ./cdk
 
       - name: CDK Deploy
