@@ -59,10 +59,10 @@ resource "aws_iam_policy" "lambda_access_policy" {
       {
         Action   = "lambda:InvokeFunction"
         Effect   = "Allow",
-        Resource = "[
-          ${aws_lambda_function.get_visitors_lambda_terraform},
-          ${aws_lambda_function.post_visitors_lambda_terraform}
-        ]"
+        Resource = [
+          "${aws_lambda_function.get_visitors_lambda_terraform}",
+          "${aws_lambda_function.post_visitors_lambda_terraform}"
+        ],
       }
     ]
   })
