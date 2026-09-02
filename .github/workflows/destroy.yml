@@ -1,0 +1,221 @@
+name: Destroy Infrastructure
+
+# Manual only. Run the phases in order, one at a time:
+#   1. terraform  -> tears down the TF stack (S3, CloudFront, API GW, Lambda,
+#                    DynamoDB, KMS, Cloudflare DNS). Must run BEFORE cdk,
+#                    because cloudflare_dns.tf reads the CDK-owned API Gateway
+#                    domain via a data source.
+#   2. cdk        -> tears down the CDK stack. Expect this to fail the first
+#                    time on the replicated Lambda@Edge function; wait a few
+#                    hours and re-dispatch the same phase.
+#   3. cleanup    -> deletes what CDK retains by default (both S3 buckets, the
+#                    KMS key) plus the Terraform state bucket, then reports
+#                    whatever is still standing.
+
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: 'Teardown phase to run'
+        type: choice
+        required: true
+        options:
+          - terraform
+          - cdk
+          - cleanup
+      confirm:
+        description: 'Type DESTROY to confirm'
+        type: string
+        required: true
+
+concurrency:
+  group: destroy-infrastructure
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+      TF_VAR_cloudflare_zone_id: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+      TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      TF_VAR_acm_cert_arn: ${{ secrets.ACM_CERT_ARN }}
+      TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+    steps:
+      - name: Verify confirmation
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+          PHASE: ${{ inputs.phase }}
+        run: |
+          if [ "$CONFIRM" != "DESTROY" ]; then
+            echo "::error::The confirm input must be exactly DESTROY. Got: '$CONFIRM'"
+            exit 1
+          fi
+          echo "Confirmed. Running phase: $PHASE"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # ------------------------------------------------------------------
+      # Phase 1: Terraform
+      # ------------------------------------------------------------------
+
+      - name: Setup Terraform
+        if: inputs.phase == 'terraform'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.5
+
+      - name: Terraform init
+        if: inputs.phase == 'terraform'
+        run: terraform init
+        working-directory: ./terraform
+
+      # Lands force_destroy = true on both buckets before anything tries to
+      # delete them. Both are versioned, so destroy fails with BucketNotEmpty
+      # without this. It is an in-place attribute change, not a replacement.
+      - name: Terraform apply
+        if: inputs.phase == 'terraform'
+        run: terraform apply -auto-approve
+        working-directory: ./terraform
+
+      # The CloudFront distribution takes 15-25 minutes to disable and delete.
+      - name: Terraform destroy
+        if: inputs.phase == 'terraform'
+        run: terraform destroy -auto-approve
+        working-directory: ./terraform
+
+      # ------------------------------------------------------------------
+      # Phase 2: CDK
+      # ------------------------------------------------------------------
+
+      - name: Setup Node
+        if: inputs.phase == 'cdk'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install CDK dependencies
+        if: inputs.phase == 'cdk'
+        run: npm ci
+        working-directory: ./cdk
+
+      # Context (domain, subdomain, accountId) comes from cdk.json.
+      # If this fails with "Lambda was unable to delete ... replicated
+      # function", that is expected: AWS garbage-collects Lambda@Edge replicas
+      # hours after the distribution goes away. Re-dispatch this same phase
+      # later and it will complete.
+      - name: CDK destroy
+        if: inputs.phase == 'cdk'
+        run: npx cdk destroy cloudResumeWebsiteCDK --force
+        working-directory: ./cdk
+
+      # ------------------------------------------------------------------
+      # Phase 3: Cleanup of retained / unmanaged resources
+      # ------------------------------------------------------------------
+
+      # CDK defaults s3.Bucket to RemovalPolicy.RETAIN, so cdk destroy reports
+      # success and silently leaves these behind, still billing. The Terraform
+      # state bucket is only a backend block, never a managed resource, so
+      # terraform destroy never touches it either.
+      - name: Delete retained S3 buckets
+        if: inputs.phase == 'cleanup'
+        run: |
+          set -euo pipefail
+
+          empty_and_delete() {
+            b="$1"
+            if ! aws s3api head-bucket --bucket "$b" 2>/dev/null; then
+              echo "-- $b does not exist, skipping"
+              return 0
+            fi
+            echo "-- emptying $b"
+            aws s3 rm "s3://$b" --recursive || true
+            # Versioned buckets keep old versions and delete markers that
+            # 'rm --recursive' leaves behind; sweep those too.
+            while :; do
+              aws s3api list-object-versions --bucket "$b" --max-keys 500 \
+                --output json > /tmp/versions.json
+              jq -c '{Objects: ((.Versions // []) + (.DeleteMarkers // [])) | map({Key, VersionId})}' \
+                /tmp/versions.json > /tmp/delete.json
+              n=$(jq '.Objects | length' /tmp/delete.json)
+              if [ "$n" -eq 0 ]; then
+                break
+              fi
+              echo "   deleting $n object versions"
+              aws s3api delete-objects --bucket "$b" \
+                --delete "file:///tmp/delete.json" > /dev/null
+            done
+            aws s3api delete-bucket --bucket "$b"
+            echo "-- deleted $b"
+          }
+
+          empty_and_delete cloud-resume-website-bucket-cdk
+          empty_and_delete cloud-resume-website-bucket-logging-cdk
+          empty_and_delete cloud-resume-website-terraform-state
+
+      # kms.Key also defaults to RETAIN in CDK. Matched on its description
+      # rather than a hardcoded key id, and only customer-managed keys are ever
+      # considered. 7 days is the AWS minimum waiting period.
+      - name: Schedule deletion of the retained CDK KMS key
+        if: inputs.phase == 'cleanup'
+        run: |
+          set -euo pipefail
+          target="Cloud resume KMS key generated using CDK."
+          found=0
+          for id in $(aws kms list-keys --query 'Keys[].KeyId' --output text); do
+            meta=$(aws kms describe-key --key-id "$id" \
+              --query 'KeyMetadata.[Description,KeyState,KeyManager]' --output text)
+            description=$(echo "$meta" | cut -f1)
+            state=$(echo "$meta" | cut -f2)
+            manager=$(echo "$meta" | cut -f3)
+
+            if [ "$manager" != "CUSTOMER" ]; then continue; fi
+            if [ "$description" != "$target" ]; then continue; fi
+
+            found=1
+            if [ "$state" = "PendingDeletion" ]; then
+              echo "-- $id already scheduled for deletion"
+              continue
+            fi
+            echo "-- scheduling deletion of $id"
+            aws kms schedule-key-deletion --key-id "$id" --pending-window-in-days 7
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "-- no matching CDK KMS key found"
+          fi
+
+      - name: Report what is still standing
+        if: inputs.phase == 'cleanup'
+        run: |
+          echo "=== S3 buckets ==="
+          aws s3 ls || true
+          echo "=== CloudFront distributions ==="
+          aws cloudfront list-distributions \
+            --query 'DistributionList.Items[].{Id:Id,Status:Status,Aliases:Aliases.Items}' \
+            --output table || true
+          echo "=== Lambda functions ==="
+          aws lambda list-functions --query 'Functions[].FunctionName' --output table || true
+          echo "=== DynamoDB tables ==="
+          aws dynamodb list-tables --output table || true
+          echo "=== CloudFormation stacks ==="
+          aws cloudformation list-stacks \
+            --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE ROLLBACK_COMPLETE \
+            --query 'StackSummaries[].StackName' --output table || true
+          echo "=== Customer-managed KMS keys ==="
+          for id in $(aws kms list-keys --query 'Keys[].KeyId' --output text); do
+            aws kms describe-key --key-id "$id" \
+              --query 'KeyMetadata.[KeyId,KeyState,KeyManager,Description]' \
+              --output text || true
+          done

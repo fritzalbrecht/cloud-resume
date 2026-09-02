@@ -8,6 +8,7 @@ terraform {
 
 resource "aws_s3_bucket" "cloud_resume_website_bucket" {
   bucket = "cloud-resume-website-bucket-terraform"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_ownership_controls" "cloud_resume_website_bucket_ownership" {
@@ -89,6 +90,7 @@ resource "aws_s3_bucket_logging" "cloud_resume_website_bucket_logging" {
 
 resource "aws_s3_bucket" "cloud_resume_website_logging_bucket" {
   bucket = "cloud-resume-website-logging-bucket-terraform"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_acl" "log_bucket_acl" {
