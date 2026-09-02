@@ -4,6 +4,20 @@ terraform {
       source = "cloudflare/cloudflare"
       version = "~> 4"
     }
+    # This config was written against AWS provider v5. Nothing here is pinned in
+    # git (.terraform.lock.hcl is gitignored), so every `terraform init` resolves
+    # to the newest release -- currently v6.x, which REMOVED `stage_name` from
+    # aws_api_gateway_deployment. Pinning back to 5.x is what lets `destroy` run
+    # against the same schema the state was written with. Do not bump this to
+    # v6 just to make the plan validate; see the note in api_gw.tf.
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.0"
+    }
   }
 }
 
